@@ -1,0 +1,385 @@
+---
+title: "DataScience - Week2Assignment"
+author: "Kishore Prasad"
+date: "Saturday, November 07, 2015"
+output: html_document
+---
+
+1. 
+
+(a) What is the probability of rolling a pair of dice and obtaining a total score of 9 or more? 
+
+```{r}
+total_outcomes <- 6*6
+fav_outcomes <- 9 # {(3,6), (4,5), (4,6), (5,4), (5,5), (5,6), (6,6), (6,5), (6,6)} = 9
+Pof9 <- fav_outcomes / total_outcomes
+Pof9
+```
+
+(b) What is the probability of rolling a pair of dice and obtaining a total score of 7?
+
+
+```{r}
+total_outcomes <- 6*6
+fav_outcomes <- 6 # {(1,6), (2,5), (3,4), (4,3), (5,2), (6,1) } = 6
+Pof7 <- fav_outcomes / total_outcomes
+Pof7
+```
+
+2. A box contains four black pieces of cloth, two striped pieces, and six dotted pieces. A piece is selected randomly and then placed back in the box. A second piece is selected randomly. What is the probability that:
+
+a. both pieces are dotted?
+
+```{r}
+
+P_black <- 4 / 12
+P_striped <- 2 / 12
+P_dotted <- 6 / 12
+
+P_2dotted = P_dotted * P_dotted
+P_2dotted
+
+```
+
+
+b. the first piece is black and the second piece is dotted?
+```{r}
+P_black <- 4 / 12
+P_striped <- 2 / 12
+P_dotted <- 6 / 12
+
+P_black_dotted = P_black * P_dotted
+P_black_dotted
+
+```
+
+c. one piece is black and one piece is striped?
+
+```{r}
+P_black <- 4 / 12
+P_striped <- 2 / 12
+P_dotted <- 6 / 12
+
+P_one_black_striped <- (P_black * P_striped) + (P_striped * P_black) 
+P_one_black_striped
+
+```
+
+3. A card is drawn at random from a deck. 
+a. What is the probability that it is an ace or a king? 
+
+```{r}
+P_ace <- 4 / 52
+P_king <- 4 / 52
+P_red <- 26 / 52
+P_black <- 26 / 52
+P_ace_and_king <- 0
+
+P_ace_or_king <- P_ace + P_king - P_ace_and_king 
+P_ace_or_king
+
+```
+b. What is the probability that it is either a red card or a black card?
+
+```{r}
+P_ace <- 4 / 52
+P_king <- 4 / 52
+P_red <- 26 / 52
+P_black <- 26 / 52
+P_red_and_black <- 0
+
+P_red_or_black <- P_red + P_black - P_red_and_black 
+P_red_or_black
+
+```
+
+4. The probability that you will win a game is 0.45. 
+a. If you play the game 80 times, what is the most likely number of wins? 
+
+```{r}
+N <- 80
+P_win <- 0.45
+
+likely_wins <- N * P_win
+likely_wins
+
+```
+
+
+b. The mean and var of a binomial distribution with p = 0.45 and N = 80?
+
+```{r}
+N <- 80
+P_win <- 0.45
+
+mean_wins <- N * P_win
+mean_wins
+
+var_wins <-N * P_win * (1 - P_win)
+var_wins
+
+```
+
+5. A fair coin is flipped 9 times. What is the probability of getting exactly 6 heads?
+
+```{r}
+N <- 9
+P_win <- 0.5
+x <- 6
+
+prob_6 <- dbinom(x,size=N, prob = P_win)
+prob_6
+
+```
+
+6. When Susan and Jessica play a card game, Susan wins 60% of the time. If they play 9 game, what is the probability that Jessica will have won more games than Susan?
+
+```{r}
+N <- 9
+P_Jessica_win <- 1 - 0.6 
+
+# Subtracting the cumulative probability of 4 from cumulative probability of 9 gives winnings of Jessica that is more than susan
+
+P_Jessica_Wins_More <- pbinom(9, size=N, prob=P_Jessica_win) - pbinom(4, size=N, prob=P_Jessica_win)
+
+P_Jessica_Wins_More
+
+```
+
+7. You flip a coin three times. 
+a. What is the probability of getting heads on only one of your flips? 
+
+```{r}
+
+tot_outcomes <- 8
+fav_outcomes <- 3
+P_only_one_Head <- fav_outcomes / tot_outcomes
+
+P_only_one_Head
+
+```
+
+b. What is the probability of getting heads on at least one flip?
+
+```{r}
+
+tot_outcomes <- 8
+fav_outcomes <- 7
+P_only_one_Head <- fav_outcomes / tot_outcomes
+P_only_one_Head
+
+```
+
+8. A test correctly identifies a disease in 95% of people who have it. It correctly identifies no disease in 94% of people who do not have it. In the population, 3% of the people have the disease. What is the probability that you have the disease if you tested positive?
+
+```{r}
+
+P_D <- 0.03
+P_D_n <- (1-P_D)
+
+P_T_D <- 0.95
+P_T_D_n <- (1-P_T_D)
+
+P_D_T <-  (P_T_D * P_D) / (( P_T_D * P_D)   + (P_T_D_n * P_D_n))
+
+P_D_T
+
+```
+
+9. A jar contains 10 blue marbles, 5 red marbles, 4 green marbles, and 1 yellow marble. Two marbles are chosen (without replacement).
+
+a. What is the probability that one will be green and the other red? 
+
+Soln : 
+
+Case 1 = P(first Green and second Red) 
+Case 2 = P(first Red and second Green)
+P(Case 1 or Case 2) = P(Case1) + P(Case 2) - P(Case 1 and Case 2)
+
+Here P(Case 1 and Case 2) is 0 since it cannot be both Green and Red at the same time.
+
+```{r}
+
+P_Case1 <- (4 / 20) * (5 / 19)
+P_Case2 <- (5 / 20) * (4 / 19)
+
+P_G_and_R <- P_Case1 + P_Case2 - 0
+
+P_G_and_R
+
+```
+
+b. What is the probability that one will be blue and the other yellow?
+
+Taking a similar approach as above, we get:
+
+```{r}
+
+P_Case1 <- (10 / 20) * (1 / 19)
+P_Case2 <- (1 / 20) * (10 / 19)
+
+P_B_and_Y <- P_Case1 + P_Case2 - 0
+
+P_B_and_Y
+
+```
+
+10. You roll a fair die five times, and you get a 6 each time. What is the probability that you get a 6 on the next roll?
+P(6) = 1 / 6 = 0.1667
+
+
+```{r}
+
+tot_outcomes <- 6
+fav_outcomes <- 1
+P_6 <- fav_outcomes / tot_outcomes
+
+P_6
+
+```
+
+
+11. You win a game if you roll a die and get a 2 or a 5. You play this game 60 times.
+
+a. What is the probability that you win between 5 and 10 times (inclusive)?
+
+```{r}
+
+N <- 60
+pi <- 2 / 6
+
+P_5_to_10 <- pbinom(10,size=N,prob=pi) - pbinom(5,size=N,prob=pi)
+P_5_to_10
+
+```
+
+b. What is the probability that you will win the game at least 15 times?
+
+```{r}
+
+N <- 60
+pi <- 2 / 6
+
+P_15 <- pbinom(14, size=N, prob=pi, lower.tail=FALSE)
+P_15
+
+```
+
+c.	What is the probability that you will win the game at least 40 times?
+
+```{r}
+
+N <- 60
+pi <- 2 / 6
+
+P_40 <- pbinom(39, size=N, prob=pi, lower.tail=FALSE)
+P_40
+
+```
+
+d.	What is the most likely number of wins.
+
+```{r}
+
+N <- 60
+pi <- 2 / 6
+
+likely_wins <- N * pi
+likely_wins
+
+```
+
+
+e.	What is the probability of obtaining the number of wins in d? Explain how you got each answer or show your work.
+
+```{r}
+
+N <- 60
+pi <- 2 / 6
+
+P_20 <- pbinom(19, size=N, prob=pi, lower.tail=FALSE)
+P_20
+
+```
+
+12.	In a baseball game, Tommy gets a hit 30% of the time when facing this pitcher. Joey gets a hit 25% of the time. They are both coming up to bat this inning.
+
+a.	What is the probability that Joey or Tommy will get a hit?
+
+```{r}
+
+P_Tommy <- 0.3
+P_Joey <- 0.25
+
+P_Tommy_OR_Joey <- P_Tommy + P_Joey - ( P_Tommy * P_Joey)
+
+P_Tommy_OR_Joey
+
+```
+
+b.	What is the probability that neither player gets a hit?
+
+```{r}
+
+P_Tommy_not <- 1 - 0.3
+P_Joey_not <- 1 - 0.25
+
+P_neither <- P_Tommy_not * P_Joey_not
+
+P_neither
+
+```
+
+
+c.	What is the probability that they both get a hit?
+
+```{r}
+
+P_Tommy <- 0.3
+P_Joey <- 0.25
+
+P_Tommy_AND_Joey <-  P_Tommy * P_Joey
+
+P_Tommy_AND_Joey
+
+```
+
+
+13.	An unfair coin has a probability of coming up heads of 0.65. The coin is flipped 50 times. What is the probability it will come up heads 25 or fewer times? (Give answer to at least 3 decimal places).
+
+```{r}
+
+N <- 50
+pi <- 0.65
+
+P_25 <- pbinom(25, size=N, prob=pi)
+round(P_25,3)
+
+```
+
+14. You draw two cards from a deck, what is the probability that:
+a. both of them are face cards (king, queen, or jack)?
+
+Given that the first card was a Face, we now have 1 face less and 1 card less in the pack. hence the probability of a face on the second is 11 out of 51 cards : 
+
+```{r}
+
+P_Face_Face <- 11 / 51
+P_Face_Face
+
+```
+b. you draw two cards from a deck and both of them are hearts?
+
+Given that the first card was a heart, we now have 1 heart less and 1 card less in the pack. hence the probability of a heart on the second is 12 out of 51 cards : 
+
+```{r}
+
+P_heart_heart <- 12 / 51
+P_heart_heart
+
+```
+
+15.	True/False: You are more likely to get a pattern of HTHHHTHTTH than HHHHHHHHTT when you flip a coin 10 times.
+
+FALSE : Assuming that the coin is unbiased, each flip of a coin has an equal probaility of throwing up of a H or a T. For 10 flips, we cannot say that one pattern has a better probability than the other. However, over a large number of flips the number of H tends to be equal to the number of T. 
+
