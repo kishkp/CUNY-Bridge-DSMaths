@@ -1,0 +1,696 @@
+---
+title: "DS Maths - Assignment - Week 3"
+author: "Kishore Prasad"
+date: "November 13, 2015"
+output:
+  html_document:
+    toc: true
+---
+
+# Introduction to Statistics
+
+### Chapter 7
+
+1. If scores are normally distributed with a mean of 35 and a standard deviation of 10, what percent of the scores is:
+
+a. greater than 34?
+
+```{r}
+
+pnorm(34, mean=35, sd=10, lower.tail = FALSE)
+
+```
+
+b. smaller than 42?
+
+```{r}
+
+pnorm(42, mean=35, sd=10, lower.tail = TRUE)
+
+```
+
+
+c. between 28 and 34?
+
+```{r}
+
+pnorm(34, mean=35, sd=10, lower.tail = TRUE) - pnorm(28, mean=35, sd=10, lower.tail = TRUE)
+
+# diff(pnorm(c(28,34), mean=35, sd=10, lower.tail = TRUE))
+
+```
+
+2. What are the mean and standard deviation of the standard normal distribution?
+
+Ans: The mean is 0 and standard deviation is 1
+
+(b) What would be the mean and standard deviation of a distribution created by
+multiplying the standard normal distribution by 8 and then adding 75?
+
+Ans : If m is the mean and sd is the standard deviation of the distribution, then 
+
+new mean = nm = 8m + 75
+new sd = nsd = 8sd
+
+3. The normal distribution is defined by two parameters. What are they?
+
+ans : Mean and Standard Deviation
+
+4. What proportion of a normal distribution is within one standard deviation of the mean? 
+
+```{r}
+
+diff(pnorm(c(-1,1), mean=0, sd=1, lower.tail = TRUE))
+
+```
+
+(b) What proportion is more than 2.0 standard deviations from the mean?
+
+```{r}
+
+1 - diff(pnorm(c(-2,2), mean=0, sd=1, lower.tail = TRUE))
+
+```
+
+(c) What proportion is between 1.25 and 2.1 standard deviations above the mean?
+
+```{r}
+
+diff(pnorm(c(1.25,2.1), mean=0, sd=1, lower.tail = TRUE))
+
+```
+
+5. A test is normally distributed with a mean of 70 and a standard deviation of 8.
+(a) What score would be needed to be in the 85th percentile? 
+
+```{r}
+
+qnorm(0.85, mean=70, sd=8, lower.tail = TRUE)
+
+```
+
+(b) What score would be needed to be in the 22nd percentile?
+
+```{r}
+
+qnorm(0.22, mean=70, sd=8, lower.tail = TRUE)
+
+```
+
+
+6. Assume a normal distribution with a mean of 70 and a standard deviation of 12.
+What limits would include the middle 65% of the cases?
+
+```{r}
+
+lower_limit <- qnorm((1-0.65)/2, mean=70, sd=12, lower.tail = TRUE)
+lower_limit
+
+upper_limit <- qnorm(1-(1-0.65)/2, mean=70, sd=12, lower.tail = TRUE)
+upper_limit
+
+```
+7. A normal distribution has a mean of 20 and a standard deviation of 4. Find the Z
+scores for the following numbers: 
+
+(a) 28 
+
+```{r}
+
+(28 - 20) / 4
+
+```
+
+(b) 18 
+
+```{r}
+
+(18 - 20) / 4
+
+```
+
+(c) 10 
+
+```{r}
+
+(10 - 20) / 4
+
+```
+
+(d) 23
+
+```{r}
+
+(23 - 20) / 4
+
+```
+
+8. Assume the speed of vehicles along a stretch of I-10 has an approximately normal distribution with a mean of 71 mph and a standard deviation of 8 mph.
+
+a. The current speed limit is 65 mph. What is the proportion of vehicles less than or equal to the speed limit?
+
+```{r}
+
+pnorm(65, mean=71, sd=8, lower.tail = TRUE)
+
+```
+
+b. What proportion of the vehicles would be going less than 50 mph?
+
+```{r}
+
+pnorm(49, mean=71, sd=8, lower.tail = TRUE)
+
+```
+
+c. A new speed limit will be initiated such that approximately 10% of vehicles will be over the speed limit. What is the new speed limit based on this criterion?
+
+```{r}
+
+qnorm(0.1, mean=71, sd=8, lower.tail = FALSE)
+
+```
+
+d. In what way do you think the actual distribution of speeds differs from a normal distribution?
+
+
+
+9. A variable is normally distributed with a mean of 120 and a standard deviation of 5. One score is randomly sampled. What is the probability it is above 127?
+
+```{r}
+
+pnorm(127, mean=120, sd=5, lower.tail = FALSE)
+
+```
+
+
+10. You want to use the normal distribution to approximate the binomial distribution. Explain what you need to do to find the probability of obtaining exactly 7 heads out of 12 flips.
+
+Ans:
+
+a. Calculate the mean and standard deviation of the  binomial distribution
+
+```{r}
+
+b_mean <- 12 * 0.5
+b_mean
+b_sd <- sqrt(12*0.5)*(1-0.5)
+b_sd
+
+```
+b. Therefore a total of 7 heads out of 12 would give a sd above mean of the distribution. This sd associated with 7 heads would be :
+
+```{r}
+
+req_sd <- (7-b_mean) / b_sd 
+req_sd
+```
+
+c. So now the question, What is the probability of getting a value exactly 0.8165 standard deviations above the mean ? 
+
+In reality the answer is 0 since this is a binomial distribution and it is a discrete probability distribution. However, we now need to convert this probability to a continuous probability distribution. To this effect, instead of calculating a probability of exactly 7 heads, we calculate the probability of getting a probability of 6.5 to 7.5.
+
+d. The probability that we will get 7 heads :
+
+```{r}
+
+diff(pnorm(c(6.5,7.5), mean=b_mean, sd=b_sd, lower.tail = TRUE))
+
+```
+
+
+### Chapter 9
+
+1. A population has a mean of 50 and a standard deviation of 6. (a) What are the mean and standard deviation of the sampling distribution of the mean for N = 16? (b) What are the mean and standard deviation of the sampling distribution of the mean for N = 20?
+
+```{r}
+
+M <- 50
+P_sd <- 6
+
+sample_mean <- function(M){  M }
+sample_variance <- function(M, p_sd, N) {  (p_sd^2) / N } 
+sample_sd <- function(M, p_sd, N) {  sqrt((p_sd^2) / N) }
+
+# mean and sd for N = 16 
+sample_mean(M)
+sample_sd(M, P_sd, 16)
+
+# mean and sd for N = 20 
+sample_mean(M)
+sample_sd(M, P_sd, 20)
+
+```
+
+2. Given a test that is normally distributed with a mean of 100 and a standard deviation of 12, find:
+
+a. the probability that a single score drawn at random will be greater than 110
+
+```{r}
+
+pnorm(110, mean=100, sd=12, lower.tail = FALSE)
+
+```
+
+
+b. the probability that a sample of 25 scores will have a mean greater than 105
+
+```{r}
+
+pnorm(105, mean=100, sd=sqrt((12^2) / 25), lower.tail = FALSE)
+
+```
+
+c. the probability that a sample of 64 scores will have a mean greater than 105
+
+```{r}
+
+pnorm(105, mean=100, sd=sqrt((12^2) / 64), lower.tail = FALSE)
+
+```
+
+d. the probability that the mean of a sample of 16 scores will be either less than 95 or greater than 105
+
+```{r}
+
+pnorm(95, mean=100, sd=sqrt((12^2) / 16), lower.tail = TRUE) + pnorm(105, mean=100, sd=sqrt((12^2) / 16), lower.tail = FALSE) 
+
+```
+
+
+3. What term refers to the standard deviation of a sampling distribution?
+
+Ans : Standard Error of the Mean 
+
+4. (a) If the standard error of the mean is 10 for N = 12, what is the standard error
+of the mean for N = 22? 
+
+```{r}
+
+# given sigma_M = sigma / sqrt(N), we get sigma = sigma_m * sqrt(N). Using this to equate both N we get, 
+
+# 10 * sqrt(12) = sigma_22 * sqrt(22)
+
+# sigma_22 = 10 * sqrt(12) / sqrt(22)
+
+10 * sqrt(12) / sqrt(22)
+
+```
+
+
+(b) If the standard error of the mean is 50 for N = 25, what is it for N = 64?
+
+```{r}
+
+# Applying the same logic as above, sigma_64 = 50 * sqrt(25) / sqrt(64)
+
+50 * sqrt(25) / sqrt(64)
+
+```
+
+
+5. A questionnaire is developed to assess women's and men's attitudes toward using animals in research. One question asks whether animal research is wrong and is answered on a 7-point scale. Assume that in the population, the mean for women is 5, the mean for men is 4, and the standard deviation for both groups is 1.5. Assume the scores are normally distributed. If 12 women and 12 men are selected randomly, what is the probability that the mean of the women will be more than 2 points higher than the mean of the men?
+
+```{r}
+
+# difference between means
+
+mean_w <- 5
+mean_m <- 4
+
+sd_w <- 1.5
+sd_m <- 1.5
+
+mean_diff <- mean_w - mean_m
+SE <- sqrt(((1.5^2)/ 12) + ((1.5^2)/ 12)) 
+
+pnorm(2, mean=1, sd=SE, lower.tail = FALSE)
+
+```
+
+6. If the correlation between reading achievement and math achievement in the population of fifth graders were 0.60, what would be the probability that in a sample of 28 students, the sample correlation coefficient would be greater than 0.65?
+
+```{r}
+
+# difference between means
+
+P_cor <- 0.6
+s_cor <- 0.65
+N <- 28
+
+pnorm(0.5 * log((1+s_cor)/(1-s_cor)), mean=0.5 * log((1+P_cor)/(1-P_cor)), sd=(1 / sqrt(N-3)), lower.tail = FALSE)
+
+```
+
+7. If numerous samples of N = 15 are taken from a uniform distribution and a
+relative frequency distribution of the means is drawn, what would be the shape of
+the frequency distribution?
+
+Ans: It would be normal distribution 
+        
+8. A normal distribution has a mean of 20 and a standard deviation of 10. Two scores are sampled randomly from the distribution and the second score is subtracted from the first. What is the probability that the difference score will be greater than 5? Hint: Read the Variance Sum Law section of Chapter 3.
+
+```{r}
+
+sample_mean <- 20 - 20
+std_err <- sqrt(2 * (100^2/2)) 
+pnorm(5, mean = sample_mean, sd=std_err, lower.tail = FALSE )
+
+```
+
+
+9. What is the shape of the sampling distribution of r? In what way does the shape
+depend on the size of the population correlation?       
+
+Ans: The shape of the sampling distribution of r is negatively skewed. Higher the size of the population correlation, more pronounced the skew.
+
+
+10. If you sample one number from a standard normal distribution, what is the
+probability it will be 0.5?
+
+Ans : Technically in any distribution of a continuous variable, the probability of finding an exact match is always 0. However, a possible solution would be to find the range of probabilities between a closed range of the distribution. Suppose, we calcilate the area between 0.45 and 0.55, it will provide an approximation to the required probability. Using this approach, the probability is:
+
+```{r}
+
+diff(pnorm(c(0.45,0.55), mean=0, sd=1, lower.tail = TRUE))
+
+```
+
+11. A variable is normally distributed with a mean of 120 and a standard deviation of 5. Four scores are randomly sampled. What is the probability that the mean of the four scores is above 127?
+
+```{r}
+
+pnorm(127, mean=120, sd=5/sqrt(4), lower.tail = FALSE)
+
+```
+12. The correlation between self-esteem and extraversion is .30. A sample of 84 is taken. 
+
+a. What is the probability that the correlation will be less than 0.10? 
+
+```{r}
+
+P_cor <- 0.3
+s_cor <- 0.1
+N <- 84
+
+pnorm(0.5 * log((1+s_cor)/(1-s_cor)), mean=0.5 * log((1+P_cor)/(1-P_cor)), sd=(1 / sqrt(N-3)), lower.tail = TRUE)
+
+```
+
+b. What is the probability that the correlation will be greater than 0.25?
+
+```{r}
+
+P_cor <- 0.3
+s_cor <- 0.25
+N <- 84
+
+pnorm(0.5 * log((1+s_cor)/(1-s_cor)), mean=0.5 * log((1+P_cor)/(1-P_cor)), sd=(1 / sqrt(N-3)), lower.tail = FALSE)
+
+```
+
+13. The mean GPA for students in School A is 3.0; the mean GPA for students in School B is 2.8. The standard deviation in both schools is 0.25. The GPAs of both schools are normally distributed. If 9 students are randomly sampled from each school, what is the probability that:
+
+a. the sample mean for School A will exceed that of School B by 0.5 or more?
+
+```{r}
+sample_mean <- 3.0 - 2.8
+std_err <- sqrt(2 * (0.25^2/9)) 
+pnorm(0.5, mean = sample_mean, sd=std_err, lower.tail = FALSE )
+
+```
+
+b. the sample mean for School B will be greater than the sample mean for School A?
+
+```{r}
+sample_mean <- 2.8 - 3.0
+std_err <- sqrt(2 * (0.25^2/9))
+
+pnorm(0, mean = sample_mean, sd=std_err, lower.tail = FALSE )
+
+```
+
+
+14. In a city, 70% of the people prefer Candidate A. Suppose 30 people from this
+city were sampled.
+
+a. What is the mean of the sampling distribution of p?
+
+Ans : It is 0.7
+
+b. What is the standard error of p?
+
+```{r}
+
+sqrt(0.7 * (1-0.7) / 30)
+
+```
+
+
+c. What is the probability that 80% or more of this sample will prefer Candidate A?
+
+```{r}
+
+pnorm(0.8, mean=0.7, sd=sqrt(0.7 * (1-0.7) / 30), lower.tail = FALSE)
+
+```
+
+15. When solving problems where you need the sampling distribution of r, what is the reason for converting from r to z'?
+
+Ans: r is a skewed distribution and hence not useful to calculate the probabilities directly. Instead a Z' trnasformation renders it to be normally distributed and can easily be used to calculate various statistic that depend on a normal distribution.
+
+
+### Chapter 10
+
+10. The effectiveness of a blood-pressure drug is being investigated. How might an experimenter demonstrate that, on average, the reduction in systolic blood pressure is 20 or more?
+
+Ans: The experimenter can set up two groups - one control and one experimental group. Members of both groups should have similar demographics and health parameters with blood pressure being one of the complaints. The new drug is now administered to the experimental group. After a period of time, the blood pressures are measured. This experiment is repeated several times. If the experimenter can demonstrate that in each trial, the decrease in systolic blood pressure is around 20 with a 95% confidence interval, we can then conclude that the effect of the drug is present.
+
+Alternately, a single groups can become the control group as well as the experimental group with a repeated measures design.
+
+
+11. A population is known to be normally distributed with a standard deviation of 2.8. 
+
+(a) Compute the 95% confidence interval on the mean based on the following sample of nine: 8, 9, 10, 13, 14, 16, 17, 20, 21. 
+
+Ans: Since the variation is known we will use a normal distribution instead of the t-distribution for calculating the confidence intervals.
+
+```{r}
+
+samples <- c(8, 9, 10, 13, 14, 16, 17, 20, 21)
+std_dev <- 2.8
+N=length(samples)
+
+samples_mean <- mean(samples)
+samples_sd <- std_dev / sqrt(N)
+
+
+# 95% confidence interval
+
+lower_limit_95 <- samples_mean - (1.96 * samples_sd)  
+lower_limit_95
+upper_limit_95 <- samples_mean + (1.96 * samples_sd)  
+upper_limit_95
+
+
+```
+
+
+(b) Now compute the 99% confidence interval using the same data.
+
+``` {r}
+# 99% confidence interval
+
+lower_limit_99 <- samples_mean - (2.58 * samples_sd)  
+lower_limit_99
+upper_limit_99 <- samples_mean + (2.58 * samples_sd)  
+upper_limit_99
+
+```
+
+12. A person claims to be able to predict the outcome of flipping a coin. This person is correct 16/25 times. Compute the 95% confidence interval on the proportion of times this person can predict coin flips correctly. What conclusion can you draw about this test of his ability to predict the future?
+
+Ans: Based on the calculations below, we find the margin of error to be about 21 %. This is quite a high margin of error and we should take the person's ability to predict with a pinch of salt.
+
+```{r}
+
+samples_mean <- 16 / 25
+samples_mean
+samples_sd <- sqrt((samples_mean * (1 - samples_mean)) / 25)
+samples_sd
+# since this is a discrete distribution we are approximating with a continuous one, we compensate by increasing the interval by  0.5 / N
+
+lower_limit_95 <- samples_mean - (1.96 * samples_sd)  - 0.5 / 25
+lower_limit_95
+upper_limit_95 <- samples_mean + (1.96 * samples_sd)  + 0.5 / 25
+upper_limit_95
+
+err_margin <- (upper_limit_95 - lower_limit_95) /2
+err_margin
+
+```
+
+13. What does it mean that the variance (computed by dividing by N) is a biased statistic?
+
+Ans : When N is used to calculate standard deviation for a sample the estimates tend to be too low. Since we divide by N, larger the sample size, smaller the standard deviation and the corresponding variance. To compensate for this bias, we use N-1 or the degrees of freedom to calculate the variance for a sample.
+
+14. A confidence interval for the population mean computed from an N of 16 ranges from 12 to 28. A new sample of 36 observations is going to be taken You can't know in advance exactly what the confidence interval will be because it depends on the random sample. Even so, you should have some idea of what it will be. Give your best estimation.
+
+Ans: Assuming that we are dealing with a 95% confidence interval and a t-distribution. We use the following calculations to calculate the new CI :
+
+``` {r}
+L_95 <- 12
+U_95 <- 28
+
+N = 16
+new_N = 36
+
+# calculate the sample mean
+
+sample_mean <- (L_95 + U_95) / 2
+
+# we know that sample_sd  = population_sd / sqrt(N). Using this in the CI formula and and for 15 degrees of freedom:
+
+# L = sample_mean - (2.131 * sample_sd) = sample_mean - (2.131 * (population_sd / sqrt(N)))
+
+# population_sd = (sample_mean - L) * sqrt(N) / 2.131
+
+population_sd <- (sample_mean - L_95) * sqrt(N) / 2.131
+
+# using the above in the new CI calculation and for 35 degrees of freedom
+
+new_L_95 <- sample_mean - (2.03 * (population_sd / sqrt(new_N)))
+new_L_95
+new_U_95 <- samples_mean + (2.03 * (population_sd / sqrt(new_N)))
+new_U_95
+
+```
+
+
+15. You take a sample of 22 from a population of test scores, and the mean of your sample is 60. 
+
+(a) You know the standard deviation of the population is 10. What is the 99% confidence interval on the population mean. 
+
+``` {r}
+# 99% confidence interval using a normal distribution since the population variance is known
+
+lower_limit_99 <- 60 - (2.58 * 10 / sqrt(22))  
+lower_limit_99
+upper_limit_99 <- 60 + (2.58 * 10 / sqrt(22))  
+upper_limit_99
+
+```
+
+(b) Now assume that you do not know the population standard deviation, but the standard deviation in your sample is 10. What is the 99% confidence interval on the mean now?
+
+``` {r}
+# 99% confidence interval using a t distribution since the population variance is unknown
+
+lower_limit_99 <- 60 - (2.819 * 10 / sqrt(22))  
+lower_limit_99
+upper_limit_99 <- 60 + (2.819 * 10 / sqrt(22))  
+upper_limit_99
+
+```
+
+
+16. You read about a survey in a newspaper and find that 70% of the 250 people sampled prefer Candidate A. You are surprised by this survey because you thought that more like 50% of the population preferred this candidate. Based on this sample, is 50% a possible population proportion? Compute the 95% confidence interval to be sure.
+
+Ans: Based on the below calculations, it seems that 50% is not a probable population proportion. Ideally, it will lie between 64% and 76%
+
+```{r}
+
+samples_mean <- 0.7 
+samples_mean
+std_err <- sqrt((samples_mean * (1 - samples_mean)) / 250)
+std_err
+
+# Calculating the CI and since this is a discrete distribution we are approximating with a continuous one, we compensate by increasing the interval by  0.5 / N
+
+lower_limit_95 <- samples_mean - (1.96 * std_err)  - 0.5 / 250
+lower_limit_95
+upper_limit_95 <- samples_mean + (1.96 * std_err)  + 0.5 / 250
+upper_limit_95
+
+```
+
+17. Heights for teenage boys and girls were calculated. The mean height for the sample of 12 boys was 174 cm and the variance was 62. For the sample of 12 girls, the mean was 166 cm and the variance was 65. Assuming equal variances and normal distributions in the population, 
+
+(a) What is the 95% confidence interval on the difference between population means? 
+
+```{r}
+
+N=12
+mean_boys <- 174
+mean_girls <- 166
+
+var_boys <- 62
+var_girls <- 65
+
+MSE <- (var_boys + var_girls) / 2
+MSE
+
+sm1_m2 <- sqrt(2 * MSE / N)
+sm1_m2
+mean_diff <- mean_boys - mean_girls
+mean_diff
+tCL <- 2.074
+
+lower_limit_95 <- mean_diff - (tCL * sm1_m2)
+lower_limit_95
+upper_limit_95 <- mean_diff + (tCL * sm1_m2)
+upper_limit_95
+
+```
+(b) What is the 99% confidence interval on the difference between population means? 
+
+```{r}
+
+tCL <- 2.819
+
+lower_limit_99 <- mean_diff - (tCL * sm1_m2)
+lower_limit_99
+upper_limit_99 <- mean_diff + (tCL * sm1_m2)
+upper_limit_99
+
+```
+
+(c) Do you think it is very unlikely that the mean difference in the population is about 5? Why or why not?
+
+Ans: I think it is very likely that the mean difference in the population to be about 5 since 5 is well within the 99% CI limits. 
+
+18. You were interested in how long the average psychology major at your college studies per night, so you asked 10 psychology majors to tell you the amount they study. They told you the following times: 2, 1.5, 3, 2, 3.5, 1, 0.5, 3, 2, 4.
+
+(a) Find the 95% confidence interval on the population mean. 
+
+```{r}
+
+samples <- c(2, 1.5, 3, 2, 3.5, 1, 0.5, 3, 2, 4)
+N=10
+samples_mean <- mean(samples)
+samples_var <- var(samples)
+samples_sd <- sqrt(samples_var/N)
+
+
+# 95% confidence interval using t distribution
+
+lower_limit_95 <- samples_mean - (2.262 * samples_sd)  
+lower_limit_95
+upper_limit_95 <- samples_mean + (2.262 * samples_sd)  
+upper_limit_95
+
+
+```
+
+(b) Find the 90% confidence interval on the population mean.
+
+```{r}
+
+# 90% confidence interval using t distribution
+
+lower_limit_95 <- samples_mean - (1.833 * samples_sd)  
+lower_limit_95
+upper_limit_95 <- samples_mean + (1.833 * samples_sd)  
+upper_limit_95
+
+```
