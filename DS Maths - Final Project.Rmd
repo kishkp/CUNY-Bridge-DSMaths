@@ -1,0 +1,232 @@
+---
+title: "CUNY - DS Maths - Final Project"
+author: "Kishore Prasad"
+date: "November 27, 2015"
+output: html_document
+---
+
+Lets first prepare the environment to use hflights data
+
+```{r}
+#install.packages("hflights")
+library(hflights)
+```
+
+Assuming that my X variable is DepDelay and Y variable is ArrDelay,  we calculate the 3rd Quartile of DepDelay and 2nd Quartile of ArrDelay as below
+
+```{r}
+DD_3Q <- quantile(hflights$DepDelay, na.rm = TRUE)[4]
+AD_2Q <- quantile(hflights$ArrDelay, na.rm = TRUE)[3]
+
+```
+
+We now, create 2 additional columns that count the observations for being greater than or less than the 3Q and 2Q variables.
+
+```{r}
+
+fdata <- cbind(hflights[ ,c("DepDelay", "ArrDelay")], A = ifelse(hflights$DepDelay>DD_3Q,1,0), B = ifelse(hflights$ArrDelay>AD_2Q,1,0) )
+
+tbl <- table(fdata$A, fdata$B)
+tbl
+```
+
+
+Using this table, we now generate the probabilities table as below:
+
+```{r}
+p<- tbl[1,1]
+q<- tbl[1,2]
+
+r<- tbl[2,1]
+s<- tbl[2,2]
+
+prob_table <- matrix(data=0,nrow=3, ncol=3)
+
+prob_table[1,1] <- p / (p+q+r+s) 
+prob_table[1,2] <- q / (p+q+r+s) 
+prob_table[1,3] <- (p+q) / (p+q+r+s) 
+
+prob_table[2,1] <- r / (p+q+r+s) 
+prob_table[2,2] <- s / (p+q+r+s) 
+prob_table[2,3] <- (r+s) / (p+q+r+s) 
+
+prob_table[3,1] <- (p+r) / (p+q+r+s) 
+prob_table[3,2] <- (q+s) / (p+q+r+s) 
+prob_table[3,3] <- (p+q+r+s) / (p+q+r+s) 
+
+prob_table
+
+```
+
+Using the prob_table, we will now answer the following questions:
+
+1. P(X>x | Y>y)
+
+```{r}
+
+prob_table[2,2]
+
+```
+
+
+2. P(X>x and Y>y)
+
+```{r}
+
+prob_table[2,3] * prob_table[3,2] 
+
+```
+
+3. P(X<x | Y>y)
+
+```{r}
+
+prob_table[1,2] 
+
+```
+
+4. P(X<x and Y>y)
+
+```{r}
+
+prob_table[1,3] * prob_table[3,2] 
+
+```
+
+generate the chisquare test
+
+```{r}
+chisq.test(tbl)
+```
+
+We can see from the above chi square output that the p-value is less than 0.05. we reject the null hypothesis that the Departure delay is independent of the arrival delay. 
+
+
+2. Descriptive and Inferential Statistics.
+
+```{r}
+library(psych)
+describe(fdata)
+
+hist(fdata$DepDelay)
+hist(fdata$ArrDelay)
+
+```
+
+A scatterplot of the 2 variables is as below
+
+```{r}
+
+plot(fdata$DepDelay, fdata$ArrDelay)
+
+```
+
+We will now generate the correlation matrix
+
+```{r}
+
+mat1 <- matrix(table(fdata$A), nrow=1, ncol=2)
+mat2 <- matrix(table(fdata$B), nrow=1, ncol=2)
+cor_mat <- cor(mat1,mat2) 
+cor_mat
+
+```
+
+
+Provide a 95% CI for the difference in the mean of DepDelay and ArrDelay.
+
+```{r}
+
+N=nrow(fdata)
+mean_depDelay <- mean(fdata$DepDelay, na.rm = TRUE)
+mean_arrDelay <- mean(fdata$ArrDelay, na.rm = TRUE)
+
+var_depDelay <- var(fdata$DepDelay, na.rm = TRUE)
+var_arrDelay <- var(fdata$ArrDelay, na.rm = TRUE)
+
+MSE <- (var_depDelay + var_arrDelay) / 2
+
+sm1_m2 <- sqrt(2 * MSE / N)
+sm1_m2
+mean_diff <- mean_depDelay - mean_arrDelay
+mean_diff
+tCL <- 2.074
+
+lower_limit_95 <- mean_diff - (tCL * sm1_m2)
+lower_limit_95
+upper_limit_95 <- mean_diff + (tCL * sm1_m2)
+upper_limit_95
+
+```
+
+We will now generate the correlation matrix for the variables depdelay and arrdelay as follows:
+
+```{r}
+
+cor_mat <- cor(fdata[1:2], use="complete.obs", method = "pearson")
+cor_mat
+
+library(corrplot)
+corrplot(cor_mat, type="upper", order="hclust", tl.col="black", tl.srt=45)
+
+```
+
+As we can see from the above correlation matrix, there is a strong positive correlation between depdelay and arrdelay. 
+
+```{r}
+
+cor_mat
+prec_mat <- solve(cor_mat)
+prec_mat
+
+A <- cor_mat
+B <- prec_mat
+
+AB <- A %*% B
+AB
+
+BA <- B %*% A
+BA
+
+```
+
+Shift values so that the minumum value is above zero
+
+```{r}
+
+fdata <- cbind(fdata, depDelay_shift = fdata$DepDelay - min(fdata$DepDelay, na.rm=TRUE), arrDelay_shift = fdata$ArrDelay - min(fdata$ArrDelay, na.rm=TRUE) )
+
+fdata$DepDelay <- fdata$DepDelay - min(fdata$DepDelay, na.rm=TRUE)
+
+```
+
+Lets now load the MASS package and fit an exponential pdf.
+
+```{r}
+
+library(MASS)
+
+depdelay_fit <- fitdistr(fdata[is.na(fdata$depDelay_shift)==FALSE,"depDelay_shift"], "exponential")
+```
+
+
+Next find the optimal value of lamdba and take 1000 samples
+
+```{r}
+depdelay_fit <- fitdistr(fdata[is.na(fdata$depDelay_shift)==FALSE,"depDelay_shift"], "poisson")
+
+depdelay_fit
+lambda <- as.numeric(depdelay_fit[1])
+
+depdelay_samples <- rexp(1000, lambda)
+
+```
+
+Next we compare the histogram of the original variable with the sample
+
+```{r}
+
+hist(fdata$depDelay_shift)
+hist(depdelay_samples)
+
+```
