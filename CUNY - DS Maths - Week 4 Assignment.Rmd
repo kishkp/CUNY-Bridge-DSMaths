@@ -1,0 +1,33 @@
+---
+title: "CUNY - DS Maths - Week 4 Assignment"
+author: "Kishore Prasad"
+date: "November 29, 2015"
+output: html_document
+---
+
+```{r setup, cache = F}
+knitr::opts_chunk$set(error = TRUE)
+```
+
+
+2. Using matrix operations, describe the solutions for the following family of equations:
+        
+ x + 2y - 3z = 5
+ 2x + y - 3z = 13
+ -x + y = -8 
+
+```{r}
+A <-matrix(c(1,2,-1, 2 ,1, 1, -3 ,-3, 0), nrow=3, ncol=3)
+B <- matrix(c(5,13,-8), nrow=3, ncol=1)
+solve(A)%*%B
+
+```
+
+4. Solve AB from #3 using R functions of your choice
+
+```{r}
+A <- matrix(c(4, -3, 0, -3, 5, 1),nrow=3, ncol=2)
+B <- matrix(c(1, 3, 4, -2),nrow=2, ncol=2)
+A%*%B
+
+```
